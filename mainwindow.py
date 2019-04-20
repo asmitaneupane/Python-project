@@ -1,7 +1,8 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QMessageBox
+from PyQt5.QtWidgets import QApplication, QWidget, QMainWindow, QPushButton, QAction, QMessageBox, QTextEdit
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtGui import QIcon
+from algorithm import vernam
  
 class App(QMainWindow):
  
@@ -10,7 +11,7 @@ class App(QMainWindow):
       self.title = 'One time pad encryption decryption'
       self.left = 10
       self.top = 10
-      self.width = 640
+      self.width = 700
       self.height = 480
       self.initUI()
 
@@ -18,22 +19,40 @@ class App(QMainWindow):
    def initUI(self):
       self.setWindowTitle(self.title)
       self.setGeometry(self.left, self.top, self.width, self.height)
-      self.statusBar().showMessage('Message in statusbar.')
-      button = QPushButton('Click', self)
-      button.clicked.connect(self.on_click)
-      button.setToolTip('This is an example button')
-      buttonReply = QMessageBox.question(self, 'PyQt5 message', "Do you like PyQt5?", QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
-      if buttonReply == QMessageBox.Yes :
-         print('Yes clicked.')
-      else :
-         print('No clicked.')
-      button.move(100,70)
+
+      self.plaintextbox = QTextEdit(self)
+      self.plaintextbox.move(20, 20)
+      self.plaintextbox.resize(280,400)
+
+      self.encryptbutton = QPushButton('Encrypt', self)
+      self.encryptbutton.clicked.connect(self.encrypt_on_click)
+      self.encryptbutton.move(300,150)
+      self.encryptbutton.setToolTip('This is an example button')
+
+      self.decryptbutton = QPushButton('Decrypt', self)
+      self.decryptbutton.clicked.connect(self.decrypt_on_click)
+      self.decryptbutton.move(300,180)
+      self.decryptbutton.setToolTip('This is an example button')
+      
+      self.ciphertextbox = QTextEdit(self)
+      self.ciphertextbox.move(380, 20)
+      self.ciphertextbox.resize(280,400)
+
       self.show()
 
-   pyqtSlot()
-   def on_click(self):
-      print('PyQt5 button click')
-      
+   @pyqtSlot()
+   def encrypt_on_click(self):
+      plaintext=self.plaintextbox.toPlainText()
+      cipher_text = vernam("mykey123",plaintext)
+      self.ciphertextbox.setText(cipher_text)      
+
+   @pyqtSlot()
+   def decrypt_on_click(self):
+      ciphertext=self.ciphertextbox.toPlainText()
+      plain_text = vernam("mykey123",ciphertext)
+      self.plaintextbox.setText(plain_text)      
+
+            
 if __name__ == '__main__':
    app = QApplication(sys.argv)
    ex = App()
